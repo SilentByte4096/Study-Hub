@@ -2,9 +2,14 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors({
   origin: true,
@@ -51,8 +56,13 @@ app.post('/api/gemini', async (req, res) => {
   }
 });
 
-// Serve index.html directly
-app.get('/', (req, res) => res.sendFile('index.html', { root: 'dist' }));
+// Serve all static frontend files from dist/
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// For any non-API route, return index.html (SPA fallback)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 8787;
-app.listen(PORT, () => console.log(`✅ AI proxy listening on :${PORT}`));
+app.listen(PORT, () => console.log(`✅ AI proxy + frontend listening on :${PORT}`));
