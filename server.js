@@ -68,6 +68,10 @@ app.post('/api/gemini', async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 });
+app.use(express.static('public'));
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve('public', 'index.html'));
+});
 
 const PORT = process.env.PORT || 8787;
 app.listen(PORT, () => {
